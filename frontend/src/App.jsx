@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
@@ -6,17 +6,17 @@ const App = () => {
 
   const [movieName, setMovieName] = useState("");
   const [movieReview, setMovieReview] = useState("");
+  const [movieReviewList, setMovieReviewList] = useState([]);
 
   const submitReview = () => {
-    console.log(validateForm());
-    // if (validateForm()) {
+    if (validateForm()) {
       axios.post('http://localhost:3001/api/submit_review', {
         movie: movieName,
         review: movieReview
       })
       .then((result) => {
         if (result) {
-          console.log(result);
+          console.log(result.data);
           alert("Succesfully inserted!");
           clearForm();
           return; 
@@ -25,8 +25,9 @@ const App = () => {
       .catch((err) => {
         console.log(err);
       });
-    // }
-    // alert("please make sure fields are not empty!");
+    } else {
+      alert("please make sure fields are not empty!");
+    }
   }; 
 
   const validateForm = () => {
@@ -40,6 +41,17 @@ const App = () => {
     setMovieName("");
     setMovieReview("");
   };
+
+  useEffect(() => {
+    axios.get('http://localhost:3001/api/all_reviews')
+      .then((results) => {
+        console.log(results.data);
+        setMovieReviewList(results.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },[]);
 
   return (
     <div className="App">
@@ -56,6 +68,14 @@ const App = () => {
         }}/>
 
         <button onClick={submitReview}>Submit</button>
+
+        <ul>
+          {
+            movieReviewList.map((movie) => {
+              return <h1>{movie.movie_name} | {movie.movie_review}</h1>;
+            })
+          }
+        </ul>
        </div>
     </div>
   );

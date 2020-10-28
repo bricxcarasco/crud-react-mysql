@@ -33,6 +33,13 @@ app.post('/api/submit_review', (req, res) => {
     });
 });
 
+app.get('/api/all_reviews', (req, res) => {
+    const sql = "SELECT * FROM movie_reviews ORDER BY id DESC";
+    db.query(sql, (err, results, fields) => {
+        res.json(results);
+    });
+});
+
 app.get('/', (req, res) => {
     res.send("Hello World!");
 });
